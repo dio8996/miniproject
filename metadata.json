@@ -1,0 +1,6 @@
+{
+  "name": "ZeroAttack – Cyber Attack Detection & Prevention System",
+  "description": "Intelligent rule-based cyber attack detection, anomaly analysis, risk scoring, encrypted logs, and automated IP mitigation platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

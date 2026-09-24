@@ -1,0 +1,51 @@
+/* ZeroAttack Custom Cybersecurity Dashboard Styles */
+:root {
+  --cyan-primary: #06b6d4;
+  --cyber-bg: #020617;
+  --card-bg: #0f172a;
+}
+
+body {
+  background-color: #020617;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-feature-settings: "tnum" on;
+}
+
+/* Glassmorphism accents */
+.cyber-card {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+}
+
+.cyber-card:hover {
+  border-color: rgba(6, 182, 212, 0.4);
+}
+
+/* Severity indicators */
+.badge-critical {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-high {
+  color: #fb923c;
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.badge-medium {
+  color: #facc15;
+  background: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.badge-low {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}

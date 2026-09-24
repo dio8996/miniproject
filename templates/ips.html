@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>ZeroAttack – IP Management & Firewall Quarantine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-['Plus_Jakarta_Sans'] p-8">
+  <div class="max-w-6xl mx-auto space-y-6">
+    <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+      <div>
+        <h1 class="text-xl font-bold text-white">Blocked IP Management Console</h1>
+        <p class="text-xs text-slate-400">Automated threat containment and manual administrative overrides</p>
+      </div>
+      <a href="/" class="text-xs text-cyan-400 hover:underline">&larr; Back to Dashboard</a>
+    </div>
+
+    <!-- Manual Block Form -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 font-mono text-xs">
+      <h2 class="text-sm font-semibold text-white mb-3">Manual IP Quarantine</h2>
+      <div class="flex gap-3">
+        <input id="new-ip" type="text" placeholder="IP Address (e.g. 198.51.100.25)" class="bg-slate-950 border border-slate-800 rounded p-2 text-white flex-1">
+        <input id="new-reason" type="text" placeholder="Reason / Incident justification" class="bg-slate-950 border border-slate-800 rounded p-2 text-white flex-1">
+        <button onclick="blockManualIp()" class="px-4 py-2 bg-rose-700 hover:bg-rose-600 font-bold text-white rounded">Block IP</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden font-mono text-xs">
+      <table class="w-full text-left">
+        <thead class="bg-slate-950 text-slate-400">
+          <tr>
+            <th class="p-3">IP Address</th>
+            <th class="p-3">Reason</th>
+            <th class="p-3">Risk Score</th>
+            <th class="p-3">Blocked At</th>
+            <th class="p-3">Status</th>
+            <th class="p-3">Action</th>
+          </tr>
+        </thead>
+        <tbody id="ips-tbody" class="divide-y divide-slate-800">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function loadIps() {
+      fetch('/api/ips').then(r => r.json()).then(d => {
+        const tbody = document.getElementById('ips-tbody');
+        tbody.innerHTML = d.blocked_ips.map(ip => `
+          <tr class="hover:bg-slate-800/40">
+            <td class="p-3 text-cyan-300 font-bold">${ip.ip_address}</td>
+            <td class="p-3 text-slate-300">${ip.reason}</td>
+            <td class="p-3 text-rose-400 font-bold">${ip.risk_score}</td>
+            <td class="p-3 text-slate-400">${ip.blocked_at.split('T')[0] || ip.blocked_at}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] ${ip.status === 'ACTIVE' ? 'bg-rose-950 text-rose-400 border border-rose-800' : 'bg-slate-800 text-slate-400'}">${ip.status}</span></td>
+            <td class="p-3">
+              ${ip.status === 'ACTIVE' ? `<button onclick="unblock('${ip.ip_address}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded">Unblock</button>` : '<span class="text-slate-500">None</span>'}
+            </td>
+          </tr>
+        `).join('');
+      });
+    }
+
+    async function blockManualIp() {
+      const ip = document.getElementById('new-ip').value;
+      const reason = document.getElementById('new-reason').value;
+      if (!ip) return;
+      await fetch('/api/ips/block', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip_address: ip, reason: reason || 'Manual Admin Quarantine' })
+      });
+      document.getElementById('new-ip').value = '';
+      document.getElementById('new-reason').value = '';
+      loadIps();
+    }
+
+    async function unblock(ip) {
+      await fetch(`/api/ips/${ip}/unblock`, { method: 'POST' });
+      loadIps();
+    }
+
+    loadIps();
+  </script>
+</body>
+</html>

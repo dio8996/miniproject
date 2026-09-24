@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZeroAttack – Live Security Monitor & Inspection Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-['Plus_Jakarta_Sans'] antialiased">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-slate-900/90 border-r border-slate-800 flex flex-col shrink-0">
+      <div class="p-5 border-b border-slate-800">
+        <span class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          <span class="h-3 w-3 rounded-full bg-cyan-400"></span>
+          ZeroAttack
+        </span>
+        <p class="text-xs text-slate-400 mt-0.5">Threat Detection & IPS</p>
+      </div>
+      <nav class="flex-1 p-4 space-y-1.5 overflow-y-auto text-sm">
+        <a href="/" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">Dashboard</a>
+        <a href="/monitor" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-cyan-500/10 text-cyan-400 font-medium">Live Security Monitor</a>
+        <a href="/events" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">Attack Events</a>
+        <a href="/ips" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">IP Management</a>
+        <a href="/rules" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">Detection Rules</a>
+        <a href="/users" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">Users & Roles</a>
+        <a href="/reports" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">Reports</a>
+        <a href="/audit" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">Audit Logs</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-y-auto">
+      <header class="h-16 border-b border-slate-800 px-6 flex items-center justify-between bg-slate-900/40">
+        <div>
+          <h1 class="text-lg font-semibold text-white">Live Request Inspection Console</h1>
+          <p class="text-xs text-slate-400">ZeroAttack Real-Time Packet & Anomaly Engine</p>
+        </div>
+      </header>
+
+      <div class="p-6 max-w-6xl space-y-6">
+        <!-- Quick Attack Scenarios / Presets -->
+        <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quick Injection Presets:</span>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <button onclick="loadPreset('sqli')" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-rose-300 rounded border border-rose-900/50">SQL Injection (' OR 1=1)</button>
+            <button onclick="loadPreset('xss')" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-amber-300 rounded border border-amber-900/50">Cross-Site Scripting (&lt;script&gt;)</button>
+            <button onclick="loadPreset('traversal')" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-orange-300 rounded border border-orange-900/50">Path Traversal (/etc/passwd)</button>
+            <button onclick="loadPreset('bruteforce')" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-purple-300 rounded border border-purple-900/50">Brute Force Burst (45 req/min)</button>
+            <button onclick="loadPreset('normal')" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-emerald-300 rounded border border-emerald-900/50">Normal Clean Request</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Request Input Form -->
+          <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-xl space-y-4">
+            <h2 class="text-sm font-semibold text-white">HTTP Request Parameters</h2>
+            <form id="inspection-form" class="space-y-3 font-mono text-xs">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-slate-400 mb-1">Source IP Address</label>
+                  <input id="req-ip" type="text" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white" value="198.51.100.88">
+                </div>
+                <div>
+                  <label class="block text-slate-400 mb-1">HTTP Method</label>
+                  <select id="req-method" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white">
+                    <option value="GET">GET</option>
+                    <option value="POST" selected>POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-slate-400 mb-1">Request URL / Endpoint</label>
+                <input id="req-url" type="text" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white" value="/api/v1/auth/login">
+              </div>
+
+              <div>
+                <label class="block text-slate-400 mb-1">Query Parameters / Body Payload</label>
+                <textarea id="req-params" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white">username=admin' OR '1'='1&password=test</textarea>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-slate-400 mb-1">User-Agent Header</label>
+                  <input id="req-agent" type="text" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white" value="Mozilla/5.0 (Windows NT 10.0; Win64; x64)">
+                </div>
+                <div>
+                  <label class="block text-slate-400 mb-1">Request Frequency (req/min)</label>
+                  <input id="req-frequency" type="number" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white" value="4">
+                </div>
+              </div>
+
+              <button type="submit" class="w-full mt-3 py-2.5 bg-cyan-600 hover:bg-cyan-500 font-semibold text-white rounded-lg transition tracking-wide">
+                Analyze Request
+              </button>
+            </form>
+          </div>
+
+          <!-- Result Display -->
+          <div id="result-panel" class="bg-slate-900/80 border border-slate-800 p-6 rounded-xl flex flex-col">
+            <h2 class="text-sm font-semibold text-white mb-4">Inspection Diagnosis & Mitigation</h2>
+            <div id="result-content" class="text-xs text-slate-400 font-mono space-y-3">
+              <div class="p-8 text-center text-slate-500">
+                Click <strong>Analyze Request</strong> or select a preset to evaluate risk against ZeroAttack rule and anomaly engines.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/js/monitor.js"></script>
+</body>
+</html>

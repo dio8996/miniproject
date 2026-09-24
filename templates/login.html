@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>ZeroAttack – Security Clearance Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
+  <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+    <div class="text-center mb-6">
+      <span class="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
+        <span class="h-3 w-3 rounded-full bg-cyan-400"></span>
+        ZeroAttack
+      </span>
+      <p class="text-xs text-slate-400 mt-1">Cyber Threat Detection & Prevention System</p>
+    </div>
+
+    <form id="login-form" class="space-y-4 text-xs font-mono">
+      <div>
+        <label class="block text-slate-400 mb-1">Username / Operator ID</label>
+        <input id="username" type="text" class="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-white" value="admin" required>
+      </div>
+      <div>
+        <label class="block text-slate-400 mb-1">Passphrase</label>
+        <input id="password" type="password" class="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-white" value="admin123" required>
+      </div>
+
+      <div class="p-3 bg-slate-950 border border-slate-800 rounded text-[11px] text-slate-400">
+        Demo Accounts: <br>
+        • <strong class="text-cyan-400">admin</strong> (Role: ADMIN)<br>
+        • <strong class="text-cyan-400">analyst</strong> (Role: SECURITY ANALYST)<br>
+        • <strong class="text-cyan-400">viewer</strong> (Role: VIEWER)
+      </div>
+
+      <button type="submit" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 font-bold text-white rounded transition">
+        Authenticate Session
+      </button>
+    </form>
+
+    <div class="mt-4 text-center text-xs text-slate-400">
+      Need an account? <a href="/register" class="text-cyan-400 hover:underline">Register clearance</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: u, password: p })
+      });
+      if (res.ok) {
+        window.location = '/';
+      } else {
+        alert('Invalid credentials');
+      }
+    });
+  </script>
+</body>
+</html>

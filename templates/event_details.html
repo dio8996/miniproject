@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>ZeroAttack – Incident Forensic Details</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-['Plus_Jakarta_Sans'] p-8">
+  <div class="max-w-4xl mx-auto space-y-6">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+      <h1 class="text-xl font-bold text-white">Forensic Investigation: Incident #{{ event_id }}</h1>
+      <a href="/events" class="text-xs text-cyan-400 hover:underline">&larr; Back to Events</a>
+    </div>
+
+    <div id="details-card" class="bg-slate-900 border border-slate-800 rounded-xl p-6 font-mono text-xs space-y-4">
+      <p class="text-slate-400">Loading incident forensics...</p>
+    </div>
+  </div>
+
+  <script>
+    const eventId = {{ event_id }};
+    fetch(`/api/events/${eventId}`)
+      .then(r => r.json())
+      .then(d => {
+        const e = d.event;
+        const card = document.getElementById('details-card');
+        card.innerHTML = `
+          <div class="grid grid-cols-2 gap-4 border-b border-slate-800 pb-4">
+            <div><span class="text-slate-400">Timestamp:</span> <span class="text-white">${e.timestamp}</span></div>
+            <div><span class="text-slate-400">Source IP:</span> <span class="text-white">${e.source_ip}</span></div>
+            <div><span class="text-slate-400">Risk Score:</span> <span class="text-rose-400 font-bold">${e.risk_score} / 100</span></div>
+            <div><span class="text-slate-400">Severity:</span> <span class="text-white">${e.severity}</span></div>
+            <div><span class="text-slate-400">Attack Type:</span> <span class="text-cyan-400">${e.attack_type}</span></div>
+            <div><span class="text-slate-400">Action Taken:</span> <span class="text-white">${e.action_taken}</span></div>
+          </div>
+          <div>
+            <span class="text-slate-400 block mb-1">Request Endpoint:</span>
+            <div class="p-2 bg-slate-950 rounded text-slate-200">${e.request_method} ${e.request_url}</div>
+          </div>
+          <div>
+            <span class="text-slate-400 block mb-1">Detection Rationale:</span>
+            <div class="p-2 bg-slate-950 rounded text-slate-300">${e.detection_reason}</div>
+          </div>
+          <div>
+            <span class="text-slate-400 block mb-1">Encrypted Record Ciphertext (AES-256-GCM):</span>
+            <div class="p-2 bg-slate-950 rounded text-cyan-300/80 break-all">${e.encrypted_payload || 'N/A'}</div>
+          </div>
+          <div class="pt-2">
+            <button onclick="decryptRecord()" class="px-4 py-2 bg-cyan-700 hover:bg-cyan-600 text-white rounded font-bold">
+              Authorized Forensic Decryption
+            </button>
+            <div id="decrypted-box" class="mt-3 p-3 bg-slate-950 border border-cyan-800/40 rounded hidden"></div>
+          </div>
+        `;
+      });
+
+    async function decryptRecord() {
+      const res = await fetch(`/api/events/${eventId}/decrypt`, { method: "POST" });
+      const data = await res.json();
+      const box = document.getElementById('decrypted-box');
+      box.classList.remove('hidden');
+      if (data.decrypted_plaintext) {
+        box.innerHTML = `<span class="text-emerald-400 font-bold block mb-1">Decrypted Payload Data:</span><pre class="text-slate-300 whitespace-pre-wrap">${data.decrypted_plaintext}</pre>`;
+      } else {
+        box.innerHTML = `<span class="text-rose-400">${data.error || 'Decryption failed'}</span>`;
+      }
+    }
+  </script>
+</body>
+</html>
